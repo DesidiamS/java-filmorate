@@ -11,14 +11,16 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
-
 @Target(ElementType.FIELD)
 @Retention(RUNTIME)
 @Constraint(validatedBy = DateValidator.class)
 @Documented
-public @interface IsAfter{
+public @interface IsAfter {
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
+
     String message() default "{message.key}";
+
     String current();
 }
