@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -33,7 +32,7 @@ public class FilmServiceTest {
         film.setName("Тестовое название");
         film.setDescription("Описание фильма");
         film.setReleaseDate(LocalDate.of(2021, 1, 13));
-        film.setDuration(Duration.ofMinutes(120));
+        film.setDuration(120L);
         assertNotNull(filmService.create(film));
     }
 
@@ -43,7 +42,7 @@ public class FilmServiceTest {
         film.setName("Тестовое название");
         film.setDescription("Описание фильма");
         film.setReleaseDate(LocalDate.of(2021, 1, 13));
-        film.setDuration(Duration.ofMinutes(120));
+        film.setDuration(120L);
         filmService.create(film);
         film.setName("Тестовое название 2");
         assertEquals("Тестовое название 2", filmService.update(film).getName());
@@ -57,7 +56,7 @@ public class FilmServiceTest {
                 " tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud" +
                 " exerci tation");
         film.setReleaseDate(LocalDate.of(2021, 1, 13));
-        film.setDuration(Duration.ofMinutes(120));
+        film.setDuration(120L);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         // Так как аннотации игнорируются внутри тестов (но работают через Postman) приходится проверять их не
         // через сервис, а вот таким образом. Если как-то можно переделать - пожалуйста, подскажите как.
@@ -70,7 +69,7 @@ public class FilmServiceTest {
         film.setName("Тестовое название");
         film.setDescription("Описание фильма");
         film.setReleaseDate(LocalDate.of(1800, 1, 13));
-        film.setDuration(Duration.ofMinutes(120));
+        film.setDuration(120L);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
@@ -81,7 +80,7 @@ public class FilmServiceTest {
         film.setName("Тестовое название");
         film.setDescription("Описание фильма");
         film.setReleaseDate(LocalDate.of(1895, 12, 28));
-        film.setDuration(Duration.ofMinutes(120));
+        film.setDuration(120L);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
@@ -92,7 +91,7 @@ public class FilmServiceTest {
         film.setName("Тестовое название");
         film.setDescription("Описание фильма");
         film.setReleaseDate(LocalDate.of(2021, 1, 13));
-        film.setDuration(Duration.ofMinutes(-120));
+        film.setDuration(-120L);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }

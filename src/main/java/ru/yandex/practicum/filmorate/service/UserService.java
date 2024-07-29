@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -21,7 +23,7 @@ public class UserService {
 
     public User create(@Valid User user) {
         user.setId(getNextId());
-        if (user.getName().isBlank() || user.getName().isEmpty()) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         users.put(user.getId(), user);
@@ -31,11 +33,17 @@ public class UserService {
 
     public User update(User user) {
         if (user.getId() == null) {
-            user.setId(getNextId());
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        if (!users.containsKey(user.getId())) {
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         if (user.getName().isBlank() || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
+
         users.put(user.getId(), user);
         log.info("User updated with id: " + user.getId());
         return user;

@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.hibernate.validator.constraints.time.DurationMin;
 import ru.yandex.practicum.filmorate.IsAfter;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 import static ru.yandex.practicum.filmorate.Constants.MAX_SIZE;
@@ -25,6 +24,6 @@ public class Film {
     private String description;
     @IsAfter(current = MIN_DATE)
     private LocalDate releaseDate;
-    @DurationMin
-    private Duration duration;
+    @Min(1)
+    private Long duration;
 }

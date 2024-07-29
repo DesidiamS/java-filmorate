@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
@@ -27,7 +29,10 @@ public class FilmService {
 
     public Film update(Film film) {
         if (film.getId() == null) {
-            film.setId(getNextId());
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (!films.containsKey(film.getId())) {
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         films.put(film.getId(), film);
         log.info("Film updated with id: " + film.getId());
