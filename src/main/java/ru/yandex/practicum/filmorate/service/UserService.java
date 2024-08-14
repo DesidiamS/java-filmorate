@@ -1,60 +1,62 @@
 package ru.yandex.practicum.filmorate.service;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpServerErrorException;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 
 @Service
 @Slf4j
 public class UserService {
 
-    private final Map<Long, User> users = new HashMap<>();
+    UserStorage userStorage;
 
-    public Collection<User> findAll() {
-        return users.values();
+    @Autowired
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
     }
 
-    public User create(@Valid User user) {
-        user.setId(getNextId());
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
+    public Collection<User> allFriendsByUserId(Long id) {
+        User user = userStorage.findById(id);
+        Collection<User> friends = new HashSet<>();
+        for (Long friendId : user.getFriends()) {
+            friends.add(userStorage.findById(friendId));
         }
-        users.put(user.getId(), user);
-        log.info("User created with id: " + user.getId());
-        return user;
+        return friends;
     }
 
-    public User update(User user) {
-        if (user.getId() == null) {
-            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+    public Collection<User> findSharedFriends(Long id, Long friendId) {
+        User user = userStorage.findById(id);
+        User friendUser = userStorage.findById(friendId);
+        Collection<User> sharedFriends = new HashSet<>();
+        for (Long friend : user.getFriends()) {
+            if (friendUser.getFriends().contains(friend)) {
+                sharedFriends.add(userStorage.findById(friend));
+            }
         }
-
-        if (!users.containsKey(user.getId())) {
-            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        if (user.getName().isBlank() || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
-
-        users.put(user.getId(), user);
-        log.info("User updated with id: " + user.getId());
-        return user;
+        return sharedFriends;
     }
 
-    private Long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    public void addFriend(Long id, Long friendId) {
+        if (userStorage.findById(friendId) != null) {
+            User user = userStorage.findById(id);
+            User friend = userStorage.findById(friendId);
+            user.getFriends().add(friendId);
+            friend.getFriends().add(id);
+        } else {
+            throw new UserNotFoundException("Пользователя которого вы хотите добавить в друзья не существует!");
+        }
+    }
+
+    public void deleteFriend(Long id, Long friendId) {
+        User user = userStorage.findById(id);
+        User friend = userStorage.findById(friendId);
+        user.getFriends().remove(friendId);
+        friend.getFriends().remove(id);
     }
 }

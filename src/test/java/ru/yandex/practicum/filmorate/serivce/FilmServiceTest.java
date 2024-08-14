@@ -7,7 +7,12 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -18,12 +23,15 @@ public class FilmServiceTest {
 
     private FilmService filmService;
     private Validator validator;
+    private FilmStorage filmStorage;
 
     @BeforeEach
     public void setup() {
-        filmService = new FilmService();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        filmStorage = new InMemoryFilmStorage();
+        UserStorage userStorage = new InMemoryUserStorage();
+        filmService = new FilmService(filmStorage, userStorage);
     }
 
     @Test
@@ -33,7 +41,7 @@ public class FilmServiceTest {
         film.setDescription("Описание фильма");
         film.setReleaseDate(LocalDate.of(2021, 1, 13));
         film.setDuration(120L);
-        assertNotNull(filmService.create(film));
+        assertNotNull(filmStorage.create(film));
     }
 
     @Test
@@ -43,9 +51,9 @@ public class FilmServiceTest {
         film.setDescription("Описание фильма");
         film.setReleaseDate(LocalDate.of(2021, 1, 13));
         film.setDuration(120L);
-        filmService.create(film);
+        filmStorage.create(film);
         film.setName("Тестовое название 2");
-        assertEquals("Тестовое название 2", filmService.update(film).getName());
+        assertEquals("Тестовое название 2", filmStorage.update(film).getName());
     }
 
     @Test
@@ -94,6 +102,21 @@ public class FilmServiceTest {
         film.setDuration(-120L);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    public void isLikeAdded() {
+        User user = new User();
+        user.setLogin("test");
+        user.setEmail("test@mail.ru");
+        user.setName("Testoviy");
+        Film film = new Film();
+        film.setName("Тестовое название");
+        film.setDescription("Описание фильма");
+        film.setReleaseDate(LocalDate.of(2021, 1, 13));
+        film.setDuration(120L);
+        filmService.addLike(user.getId(), film.getId());
+        assertFalse(film.getUsersLikes().isEmpty());
     }
 
 }
