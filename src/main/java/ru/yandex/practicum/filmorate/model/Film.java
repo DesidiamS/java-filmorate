@@ -9,6 +9,8 @@ import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.filmorate.IsAfter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ru.yandex.practicum.filmorate.Constants.MAX_SIZE;
 import static ru.yandex.practicum.filmorate.Constants.MIN_DATE;
@@ -27,4 +29,5 @@ public class Film {
     LocalDate releaseDate;
     @Min(1)
     Long duration;
+    Set<Long> usersLikes = new HashSet<>();
 }

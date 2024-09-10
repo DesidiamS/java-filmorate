@@ -7,7 +7,8 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -16,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
 
-    private UserService userService;
+    private UserStorage userStorage;
     private Validator validator;
 
     @BeforeEach
     public void setup() {
-        userService = new UserService();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        userStorage = new InMemoryUserStorage();
     }
 
     @Test
@@ -33,7 +34,7 @@ public class UserServiceTest {
         user.setBirthday(LocalDate.of(2001, 11, 8));
         user.setEmail("test@yandex.ru");
         user.setLogin("SuperLogin");
-        assertNotNull(userService.create(user));
+        assertNotNull(userStorage.create(user));
     }
 
     @Test
@@ -43,9 +44,9 @@ public class UserServiceTest {
         user.setBirthday(LocalDate.of(2001, 11, 8));
         user.setEmail("test@yandex.ru");
         user.setLogin("SuperLogin");
-        userService.create(user);
+        userStorage.create(user);
         user.setLogin("SuperLogin2");
-        assertEquals("SuperLogin2", userService.update(user).getLogin());
+        assertEquals("SuperLogin2", userStorage.update(user).getLogin());
     }
 
     @Test

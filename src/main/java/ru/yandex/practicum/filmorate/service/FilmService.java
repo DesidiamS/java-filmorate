@@ -1,51 +1,62 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpServerErrorException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class FilmService {
 
-    private final Map<Long, Film> films = new HashMap<>();
+    FilmStorage filmStorage;
+    UserStorage userStorage;
 
-    public Collection<Film> findAll() {
-        return films.values();
+    @Autowired
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
-    public Film create(Film film) {
-        film.setId(getNextId());
-        films.put(film.getId(), film);
-        log.info("Film created with id: " + film.getId());
-        return film;
-    }
-
-    public Film update(Film film) {
-        if (film.getId() == null) {
-            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+    public Collection<Film> findBestFilms(Integer count) {
+        if (count == null) {
+            count = 10;
         }
-        if (!films.containsKey(film.getId())) {
-            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        List<Film> films = filmStorage.findAll().stream().toList();
+        List<Film> bestFilms = new ArrayList<>();
+        for (Film film : films) {
+            if (film.getUsersLikes() != null && !film.getUsersLikes().isEmpty()) {
+                bestFilms.add(film);
+            }
         }
-        films.put(film.getId(), film);
-        log.info("Film updated with id: " + film.getId());
-        return film;
+        bestFilms.sort((f1, f2) -> Integer.compare(f2.getUsersLikes().size(), f1.getUsersLikes().size()));
+
+        if (!bestFilms.isEmpty()) {
+            return bestFilms.stream().limit(count).collect(Collectors.toList());
+        } else {
+            return films.stream().limit(count).collect(Collectors.toList());
+        }
     }
 
+    public void addLike(Long id, Long userId) {
+        Film film = filmStorage.findById(id);
+        User user = userStorage.findById(userId);
+        film.getUsersLikes().add(user.getId());
+    }
 
-    private Long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    public void deleteLike(Long id, Long userId) {
+        Film film = filmStorage.findById(id);
+        User user = userStorage.findById(userId);
+        if (!film.getUsersLikes().contains(user.getId())) {
+            return;
+        }
+        film.getUsersLikes().remove(user.getId());
     }
 }

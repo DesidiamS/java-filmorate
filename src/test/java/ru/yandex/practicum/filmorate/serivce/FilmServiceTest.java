@@ -7,7 +7,8 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -15,15 +16,14 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FilmServiceTest {
-
-    private FilmService filmService;
     private Validator validator;
+    private FilmStorage filmStorage;
 
     @BeforeEach
     public void setup() {
-        filmService = new FilmService();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        filmStorage = new InMemoryFilmStorage();
     }
 
     @Test
@@ -33,7 +33,7 @@ public class FilmServiceTest {
         film.setDescription("Описание фильма");
         film.setReleaseDate(LocalDate.of(2021, 1, 13));
         film.setDuration(120L);
-        assertNotNull(filmService.create(film));
+        assertNotNull(filmStorage.create(film));
     }
 
     @Test
@@ -43,9 +43,9 @@ public class FilmServiceTest {
         film.setDescription("Описание фильма");
         film.setReleaseDate(LocalDate.of(2021, 1, 13));
         film.setDuration(120L);
-        filmService.create(film);
+        filmStorage.create(film);
         film.setName("Тестовое название 2");
-        assertEquals("Тестовое название 2", filmService.update(film).getName());
+        assertEquals("Тестовое название 2", filmStorage.update(film).getName());
     }
 
     @Test
