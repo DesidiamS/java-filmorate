@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -17,15 +19,17 @@ public class UserService {
     UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDBStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
     public Collection<User> allFriendsByUserId(Long id) {
         User user = userStorage.findById(id);
-        Collection<User> friends = new HashSet<>();
-        for (Long friendId : user.getFriends()) {
-            friends.add(userStorage.findById(friendId));
+        Collection<User> friends = new ArrayList<>();
+        if (!user.getFriends().isEmpty()) {
+            for (Long friendId : user.getFriends()) {
+                friends.add(userStorage.findById(friendId));
+            }
         }
         return friends;
     }
@@ -43,20 +47,16 @@ public class UserService {
     }
 
     public void addFriend(Long id, Long friendId) {
-        if (userStorage.findById(friendId) != null) {
-            User user = userStorage.findById(id);
-            User friend = userStorage.findById(friendId);
-            user.getFriends().add(friendId);
-            friend.getFriends().add(id);
-        } else {
-            throw new UserNotFoundException("Пользователя которого вы хотите добавить в друзья не существует!");
-        }
+        // Проверка есть ли такие пользователи
+        userStorage.findById(id);
+        userStorage.findById(friendId);
+        userStorage.addFriend(id, friendId);
     }
 
     public void deleteFriend(Long id, Long friendId) {
-        User user = userStorage.findById(id);
-        User friend = userStorage.findById(friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
+        // Проверка есть ли такие пользователи
+        userStorage.findById(id);
+        userStorage.findById(friendId);
+        userStorage.deleteFriend(id, friendId);
     }
 }

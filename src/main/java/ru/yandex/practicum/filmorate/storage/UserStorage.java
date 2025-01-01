@@ -14,4 +14,8 @@ public interface UserStorage {
 
     User update(User user);
 
+    void addFriend(Long id, Long friendId);
+
+    void deleteFriend(Long id, Long friendId);
+
 }

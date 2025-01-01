@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -8,9 +9,11 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.filmorate.IsAfter;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import static ru.yandex.practicum.filmorate.Constants.MAX_SIZE;
 import static ru.yandex.practicum.filmorate.Constants.MIN_DATE;
@@ -29,5 +32,7 @@ public class Film {
     LocalDate releaseDate;
     @Min(1)
     Long duration;
-    Set<Long> usersLikes = new HashSet<>();
+    Mpa mpa;
+    List<Genre> genres = new ArrayList<>();
+    Long rate;
 }

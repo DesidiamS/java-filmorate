@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -18,7 +19,7 @@ public class UserController {
     private final UserService userService;
     private final UserStorage userStorage;
 
-    public UserController(UserService userService, UserStorage userStorage) {
+    public UserController(UserService userService, @Qualifier("userDBStorage") UserStorage userStorage) {
         this.userService = userService;
         this.userStorage = userStorage;
     }
@@ -66,7 +67,7 @@ public class UserController {
         return userService.findSharedFriends(id, otherId);
     }
 
-    @ExceptionHandler({UserNotFoundException.class})
+    @ExceptionHandler({NotFoundException.class})
     public ResponseEntity<ErrorResponse> handleUserNotFound(final RuntimeException e) {
         return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
