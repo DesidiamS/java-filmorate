@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -9,8 +8,6 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.filmorate.IsAfter;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

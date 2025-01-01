@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.mappers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;

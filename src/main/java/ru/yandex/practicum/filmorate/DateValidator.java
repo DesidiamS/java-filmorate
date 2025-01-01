@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import java.sql.Timestamp;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
+import java.time.LocalDate;
 
 public class DateValidator implements ConstraintValidator<IsAfter, LocalDate> {
 
