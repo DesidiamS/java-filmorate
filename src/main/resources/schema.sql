@@ -40,7 +40,7 @@ create table if not exists FILM_GENRE
     GENRE_ID INTEGER
         references GENRE,
     constraint FILM_GENRE_UK
-        unique (FILM_ID, GENRE_ID)
+        primary key (FILM_ID, GENRE_ID)
 );
 
 create table if not exists USERS
