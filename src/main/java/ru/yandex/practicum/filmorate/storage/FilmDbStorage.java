@@ -74,7 +74,7 @@ public class FilmDbStorage implements FilmStorage {
             }
         }
 
-        String query = "Insert Into Film(name, description, releaseDate, duration, RATINGID) values(?, ?, ?, ?, ?)";
+        String query = "INSERT Into Film(name, description, releaseDate, duration, RATINGID) values(?, ?, ?, ?, ?)";
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(query, new String[]{"id"});
             statement.setString(1, film.getName());
@@ -100,7 +100,7 @@ public class FilmDbStorage implements FilmStorage {
                     throw new BadRequestException(e.getMessage());
                 }
 
-                String query1 = "Insert Into Film_Genre(film_id, genre_id) Values(?, ?)";
+                String query1 = "INSERT Into Film_Genre(film_id, genre_id) Values(?, ?)";
                 try {
                     jdbcTemplate.update(connection1 -> {
                         PreparedStatement preparedStatement = connection1.prepareStatement(query1);
