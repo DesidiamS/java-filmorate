@@ -47,8 +47,8 @@ create table if not exists USERS
 (
     ID       INTEGER auto_increment
         primary key,
-    EMAIL    CHARACTER VARYING(250) not null,
-    LOGIN    CHARACTER VARYING(250) not null,
+    EMAIL    CHARACTER VARYING(250) not null  constraint USER_EMAIL_UK unique,
+    LOGIN    CHARACTER VARYING(250) not null constraint USER_LOGIN_UK unique,
     NAME     CHARACTER VARYING(250) not null,
     BIRTHDAY TIMESTAMP
 );
