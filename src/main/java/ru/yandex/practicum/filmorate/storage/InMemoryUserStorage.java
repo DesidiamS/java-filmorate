@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -27,7 +27,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.containsKey(id)) {
             return users.get(id);
         } else {
-            throw new UserNotFoundException("Пользователь не найден!");
+            throw new NotFoundException("Пользователь не найден!");
         }
     }
 
@@ -49,7 +49,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
 
         if (!users.containsKey(user.getId())) {
-            throw new UserNotFoundException("Пользователь не найден!");
+            throw new NotFoundException("Пользователь не найден!");
         }
 
         if (user.getName().isBlank() || user.getName().isEmpty()) {
@@ -68,5 +68,13 @@ public class InMemoryUserStorage implements UserStorage {
                 .max()
                 .orElse(0);
         return ++currentMaxId;
+    }
+
+    @Override
+    public void addFriend(Long id, Long friendId) {
+    }
+
+    @Override
+    public void deleteFriend(Long id, Long friendId) {
     }
 }

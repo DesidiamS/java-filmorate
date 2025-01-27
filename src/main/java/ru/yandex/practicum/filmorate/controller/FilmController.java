@@ -4,12 +4,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.util.Collection;
 
@@ -17,32 +16,30 @@ import java.util.Collection;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final InMemoryFilmStorage filmStorage;
     private final FilmService filmService;
 
-    public FilmController(InMemoryFilmStorage filmStorage, FilmService filmService) {
-        this.filmStorage = filmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
     @GetMapping
     public Collection<Film> getAllFilms() {
-        return filmStorage.findAll();
+        return filmService.findAllFilms();
     }
 
     @GetMapping(value = "/{id}")
     public Film getFilmById(@PathVariable Long id) {
-        return filmStorage.findById(id);
+        return filmService.findFilmById(id);
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        return filmStorage.create(film);
+        return filmService.createFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return filmStorage.update(film);
+        return filmService.updateFilm(film);
     }
 
     @PutMapping(value = "/{id}/like/{userId}")
@@ -62,14 +59,14 @@ public class FilmController {
         return filmService.findBestFilms(count);
     }
 
-    @ExceptionHandler({FilmNotFoundException.class})
-    public ResponseEntity<ErrorResponse> handleFilmNotFound(final RuntimeException e) {
+    @ExceptionHandler({NotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNotFoundException(final RuntimeException e) {
         return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({UserNotFoundException.class})
-    public ResponseEntity<ErrorResponse> handleUserNotFound(final RuntimeException e) {
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    @ExceptionHandler({BadRequestException.class})
+    public ResponseEntity<ErrorResponse> handleGenreBadRequestException(final RuntimeException e) {
+        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
 

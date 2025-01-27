@@ -1,2 +1,3 @@
 # java-filmorate
-Template repository for Filmorate project.
+
+![Схема базы данных](/Users/desidiam/Documents/Проекты/Обучение/java-filmorate/src/main/resources/DB_Graph.jpeg)
